@@ -18,9 +18,12 @@ class RegisterSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        user = User.objects.create_user(validated_data['username'], validated_data['email'], validated_data['password'])
-
-        return user
+        try:
+            user = User.objects.create_user(validated_data['username'], validated_data['email'],
+                                            validated_data['password'])
+            return user
+        except KeyError:
+            raise (serializers.ValidationError("one or more values missing"))
 
 
 # Login Serializer
@@ -33,4 +36,4 @@ class LoginSerializer(serializers.Serializer):
         if user and user.is_active:
             return user
         else:
-            raise(serializers.ValidationError("Incorrect Credentials"))
+            raise (serializers.ValidationError("Incorrect Credentials"))

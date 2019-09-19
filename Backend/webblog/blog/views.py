@@ -5,7 +5,7 @@ from blog.models import Blog
 from blog.serializers import BlogSerializer, UserSerializer
 
 
-class BlogViewSet(viewsets.ModelViewSet):
+class BlogAPI(viewsets.ModelViewSet):
     queryset = Blog.objects.all()
 
     permission_classes = [

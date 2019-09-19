@@ -1,4 +1,4 @@
-from webblog.settings.base import *
+from .base import *
 
 DEBUG = False
 INSTALLED_APPS += (
