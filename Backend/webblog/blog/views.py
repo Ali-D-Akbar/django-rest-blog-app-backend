@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.utils import timezone
 from rest_framework import viewsets, permissions
+from rest_framework.response import Response
 
 from blog.models import Blog, Comment
 from blog.permissions import IsOwnerOrReadOnly
@@ -20,6 +21,16 @@ class BlogAPI(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         serializer.save(created=timezone.now())
+
+    def list(self, request, *args, **kwargs):
+        if request.GET.get('title', '') != '':
+            queryset = Blog.objects.filter(title__icontains=request.GET.get('title'))
+        elif request.GET.get('description', '') != '':
+            queryset = Blog.objects.filter(description__icontains=request.GET.get('description'))
+        else:
+            queryset = Blog.objects.all()
+        serializer = BlogSerializer(queryset, many=True, context={'request': request})
+        return Response(serializer.data)
 
 
 class UserViewSet(viewsets.ModelViewSet):
