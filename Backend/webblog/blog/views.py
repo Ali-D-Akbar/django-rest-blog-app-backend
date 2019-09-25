@@ -23,10 +23,9 @@ class BlogAPI(viewsets.ModelViewSet):
         serializer.save(created=timezone.now())
 
     def list(self, request, *args, **kwargs):
-        if request.GET.get('title', '') != '':
-            queryset = Blog.objects.filter(title__icontains=request.GET.get('title'))
-        elif request.GET.get('description', '') != '':
-            queryset = Blog.objects.filter(description__icontains=request.GET.get('description'))
+        if request.GET.get('keyword', '') != '':
+            queryset = Blog.objects.filter(title__icontains=request.GET.get('keyword'),
+                                           description__contains=request.GET.get('keyword'))
         else:
             queryset = Blog.objects.all()
         serializer = BlogSerializer(queryset, many=True, context={'request': request})
