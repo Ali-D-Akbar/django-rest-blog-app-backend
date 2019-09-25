@@ -6,6 +6,7 @@ class Blog(models.Model):
     description = models.TextField(max_length=1500)
     created = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey('auth.User', related_name='blog', on_delete=models.CASCADE, null=True)
+    image = models.FileField(blank=True, null=True)
 
 
 class CommentManager(models.Manager):
