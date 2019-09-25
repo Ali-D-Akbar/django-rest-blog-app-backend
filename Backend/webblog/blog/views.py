@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.db.models import Q
 from django.utils import timezone
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
@@ -11,8 +12,10 @@ from blog.serializers import BlogSerializer, UserSerializer, CommentSerializer
 class BlogAPI(viewsets.ModelViewSet):
     queryset = Blog.objects.all()
 
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
-                          IsOwnerOrReadOnly]
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOrReadOnly,
+    ]
 
     serializer_class = BlogSerializer
 
@@ -24,10 +27,13 @@ class BlogAPI(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         if request.GET.get('keyword', '') != '':
-            queryset = Blog.objects.filter(title__icontains=request.GET.get('keyword'),
-                                           description__contains=request.GET.get('keyword'))
+            queryset = Blog.objects.filter(
+                Q(title__icontains=request.GET.get('keyword')) |
+                Q(description__contains=request.GET.get('keyword'))
+            )
         else:
             queryset = Blog.objects.all()
+
         serializer = BlogSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
 
