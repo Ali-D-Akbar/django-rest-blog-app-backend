@@ -5,9 +5,9 @@ from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from blog.models import Blog, Comment
+from blog.models import Blog, Comment, UserVote
 from blog.permissions import IsOwnerOrReadOnly
-from blog.serializers import BlogSerializer, UserSerializer, CommentSerializer
+from blog.serializers import BlogSerializer, UserSerializer, CommentSerializer, VoteSerializer
 
 
 class BlogAPI(viewsets.ModelViewSet):
@@ -60,9 +60,12 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class CommentAPI(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
-
     serializer_class = CommentSerializer
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
+
+class VoteAPI(viewsets.ModelViewSet):
+    queryset = UserVote.objects.all()
+    serializer_class = VoteSerializer

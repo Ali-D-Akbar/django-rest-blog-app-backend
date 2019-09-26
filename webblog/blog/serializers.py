@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
-from blog.models import Blog, Comment
+from blog.models import Blog, Comment, UserVote
 
 
 class ReplySerializer(serializers.ModelSerializer):
@@ -44,3 +44,11 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
         fields = ['url', 'id', 'username', 'blog']
+
+
+class VoteSerializer (serializers.HyperlinkedModelSerializer):
+    user = serializers.ReadOnlyField(source='user.username')
+
+    class Meta:
+        model = UserVote
+        fields = ['url', 'id', 'user', 'blog', 'vote_type']

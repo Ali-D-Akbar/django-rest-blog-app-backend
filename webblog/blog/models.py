@@ -12,20 +12,36 @@ class Blog(models.Model):
 
     def upvote(self, user):
         try:
-            self.post_votes.create(user=user, blog=self, vote_type="up")
-            self.votes += 1
+            if UserVote.objects.filter(user=user, blog=self, vote_type='down').exists():
+                self.post_votes.update(user=user, blog=self, vote_type='up')
+                self.votes += 2
+
+            else:
+                self.post_votes.create(user=user, blog=self, vote_type='up')
+                self.votes += 1
+
             self.save()
+
         except IntegrityError:
             return 'already_voted'
+
         return 'ok'
 
     def downvote(self, user):
         try:
-            self.post_votes.create(user=user, blog=self, vote_type="down")
-            self.votes -= 1
+            if UserVote.objects.filter(user=user, blog=self, vote_type='up').exists():
+                self.post_votes.update(user=user, blog=self, vote_type='down')
+                self.votes -= 2
+
+            else:
+                self.post_votes.create(user=user, blog=self, vote_type='down')
+                self.votes -= 1
+
             self.save()
+
         except IntegrityError:
             return 'already_voted'
+
         return 'ok'
 
 
@@ -54,9 +70,9 @@ class Comment(models.Model):
 
 
 class UserVote(models.Model):
-    user = models.ForeignKey(User, related_name="user_votes", on_delete=models.CASCADE)
-    blog = models.ForeignKey(Blog, related_name="post_votes", on_delete=models.CASCADE)
+    user = models.ForeignKey('auth.User', related_name='user_votes', on_delete=models.CASCADE)
+    blog = models.ForeignKey(Blog, related_name='post_votes', on_delete=models.CASCADE)
     vote_type = models.CharField(max_length=10)
 
     class Meta:
-        unique_together = ('user', 'blog')
+        unique_together = ('user', 'blog', 'vote_type')
