@@ -1,5 +1,4 @@
-from django.contrib.auth.models import User
-from django.db import models, IntegrityError
+from django.db import models
 
 
 class Blog(models.Model):
@@ -8,40 +7,29 @@ class Blog(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey('auth.User', related_name='blog', on_delete=models.CASCADE, null=True)
     image = models.FileField(blank=True, null=True)
-    votes = models.IntegerField(default=0)
+
+    @property
+    def votes(self):
+        upvotes = UserVote.objects.filter(blog=self, vote_type='up').count()
+        downvotes = UserVote.objects.filter(blog=self, vote_type='down').count()
+        return upvotes - downvotes
 
     def upvote(self, user):
-        try:
-            if UserVote.objects.filter(user=user, blog=self, vote_type='down').exists():
-                self.post_votes.update(user=user, blog=self, vote_type='up')
-                self.votes += 2
-
-            else:
-                self.post_votes.create(user=user, blog=self, vote_type='up')
-                self.votes += 1
-
-            self.save()
-
-        except IntegrityError:
+        vote, created = self.post_votes.get_or_create(user=user, blog=self)
+        if not created and vote.vote_type == 'up':
             return 'already_voted'
 
+        vote.vote_type = 'up'
+        vote.save()
         return 'ok'
 
     def downvote(self, user):
-        try:
-            if UserVote.objects.filter(user=user, blog=self, vote_type='up').exists():
-                self.post_votes.update(user=user, blog=self, vote_type='down')
-                self.votes -= 2
-
-            else:
-                self.post_votes.create(user=user, blog=self, vote_type='down')
-                self.votes -= 1
-
-            self.save()
-
-        except IntegrityError:
+        vote, created = self.post_votes.get_or_create(user=user, blog=self)
+        if not created and vote.vote_type == 'down':
             return 'already_voted'
 
+        vote.vote_type = 'down'
+        vote.save()
         return 'ok'
 
 
@@ -51,7 +39,6 @@ class Comment(models.Model):
     description = models.TextField(max_length=1500)
     created = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey('auth.User', related_name='comment', on_delete=models.CASCADE, null=True)
-    # objects = CommentManager()
 
     def children(self):
         return Comment.objects.filter(parent=self)
@@ -69,4 +56,4 @@ class UserVote(models.Model):
     vote_type = models.CharField(max_length=10)
 
     class Meta:
-        unique_together = ('user', 'blog', 'vote_type')
+        unique_together = ('user', 'blog')

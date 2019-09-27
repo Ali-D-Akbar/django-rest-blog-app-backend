@@ -7,6 +7,7 @@ INSTALLED_APPS += (
     'corsheaders',
     'knox',
     'accounts',
+    'storages',
 )
 
 REST_FRAMEWORK = {
