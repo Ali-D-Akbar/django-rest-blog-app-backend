@@ -15,7 +15,11 @@ class ReplySerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')
-    blog = serializers.HyperlinkedRelatedField(view_name='blog-detail', queryset=Blog.objects.all())
+    blog = serializers.HyperlinkedRelatedField(
+        view_name='blog-detail',
+        lookup_field='slug',
+        queryset=Blog.objects.all()
+    )
     reply = SerializerMethodField()
 
     class Meta:
@@ -35,7 +39,11 @@ class BlogSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Blog
-        fields = ['url', 'id', 'title', 'description', 'created', 'owner', 'image', 'votes', 'comment']
+        fields = ['url', 'slug', 'id', 'title', 'description', 'created', 'owner', 'image', 'votes', 'comment', 'draft']
+        lookup_field = 'slug'
+        extra_kwargs = {
+            'url': {'lookup_field': 'slug'}
+        }
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -48,6 +56,11 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
 class VoteSerializer (serializers.HyperlinkedModelSerializer):
     user = serializers.ReadOnlyField(source='user.username')
+    blog = serializers.HyperlinkedRelatedField(
+        view_name='blog-detail',
+        lookup_field='slug',
+        queryset=Blog.objects.all()
+    )
 
     class Meta:
         model = UserVote

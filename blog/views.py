@@ -17,6 +17,7 @@ class BlogAPI(viewsets.ModelViewSet):
         permissions.IsAuthenticatedOrReadOnly,
         IsOwnerOrReadOnly,
     ]
+    lookup_field = 'slug'
 
     serializer_class = BlogSerializer
 
