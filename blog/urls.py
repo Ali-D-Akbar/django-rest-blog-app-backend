@@ -8,6 +8,7 @@ router = DefaultRouter()
 router.register(r'blog', views.BlogAPI)
 router.register(r'users', views.UserViewSet)
 router.register(r'comment', views.CommentAPI)
+router.register(r'user_vote', views.VoteAPI)
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
