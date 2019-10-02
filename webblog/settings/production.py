@@ -4,6 +4,7 @@ DEBUG = False
 INSTALLED_APPS += (
     # other apps for production site
 )
+<<<<<<< HEAD
 
 AWS_LOCATION = 'static'
 AWS_ACCESS_KEY_ID = '<youraccessid>'
@@ -24,3 +25,5 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder', 'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 AWS_DEFAULT_ACL = None
+=======
+>>>>>>> master

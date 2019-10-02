@@ -2,12 +2,20 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django.utils import timezone
 from rest_framework import viewsets, permissions
+<<<<<<< HEAD
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from blog.models import Blog, Comment, UserVote
 from blog.permissions import IsOwnerOrReadOnly
 from blog.serializers import BlogSerializer, UserSerializer, CommentSerializer, VoteSerializer
+=======
+from rest_framework.response import Response
+
+from blog.models import Blog, Comment
+from blog.permissions import IsOwnerOrReadOnly
+from blog.serializers import BlogSerializer, UserSerializer, CommentSerializer
+>>>>>>> master
 
 
 class BlogAPI(viewsets.ModelViewSet):
@@ -17,7 +25,10 @@ class BlogAPI(viewsets.ModelViewSet):
         permissions.IsAuthenticatedOrReadOnly,
         IsOwnerOrReadOnly,
     ]
+<<<<<<< HEAD
     lookup_field = 'slug'
+=======
+>>>>>>> master
 
     serializer_class = BlogSerializer
 
@@ -33,13 +44,17 @@ class BlogAPI(viewsets.ModelViewSet):
                 Q(title__icontains=request.GET.get('keyword')) |
                 Q(description__contains=request.GET.get('keyword'))
             )
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
         else:
             queryset = Blog.objects.all()
 
         serializer = BlogSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
 
+<<<<<<< HEAD
     @action(detail=True)
     def upvote(self, request, *args, **kwargs):
         blog = self.get_object()
@@ -50,6 +65,8 @@ class BlogAPI(viewsets.ModelViewSet):
         blog = self.get_object()
         return Response(blog.downvote(request.user))
 
+=======
+>>>>>>> master
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -61,12 +78,19 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class CommentAPI(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
     serializer_class = CommentSerializer
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+<<<<<<< HEAD
 
 
 class VoteAPI(viewsets.ModelViewSet):
     queryset = UserVote.objects.all()
     serializer_class = VoteSerializer
+=======
+>>>>>>> master
