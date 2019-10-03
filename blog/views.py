@@ -34,8 +34,21 @@ class BlogAPI(viewsets.ModelViewSet):
                 Q(description__contains=request.GET.get('keyword'))
             )
 
+        elif request.user.is_authenticated:
+            queryset = Blog.objects.filter(
+                Q(draft=False) |
+                (Q(draft=True) & Q(owner=request.user))
+            )
+
         else:
-            queryset = Blog.objects.all()
+            queryset = Blog.objects.filter(
+                Q(draft=False)
+            )
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = BlogSerializer(page, many=True, context={'request': request})
+            return self.get_paginated_response(serializer.data)
 
         serializer = BlogSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
