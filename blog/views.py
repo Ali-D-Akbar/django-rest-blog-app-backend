@@ -39,7 +39,6 @@ class BlogAPI(viewsets.ModelViewSet):
                 Q(draft=False) |
                 (Q(draft=True) & Q(owner=request.user))
             )
-
         else:
             queryset = Blog.objects.filter(
                 Q(draft=False)
