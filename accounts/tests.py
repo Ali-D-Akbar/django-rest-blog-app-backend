@@ -1,9 +1,9 @@
 # Create your tests here.
 from django.contrib.auth.models import User
 from rest_framework import status
-from rest_framework.test import APITestCase, APIRequestFactory
+from rest_framework.test import APIRequestFactory, APITestCase
 
-from accounts.views import RegisterAPI, LoginAPI
+from accounts.views import LoginAPI, RegisterAPI
 
 
 class AccountTests(APITestCase):
