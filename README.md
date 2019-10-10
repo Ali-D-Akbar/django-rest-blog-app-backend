@@ -7,3 +7,4 @@ Installation Instructions:
 2. Open terminal and start virtual environment by running `source ./env/bin/activate`
 3. run `pip install -r requirements.txt --no-index --find-links file:///tmp/packages` to make requirements
 4. run `python manage.py runserver` to start the django server
+
