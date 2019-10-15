@@ -1,3 +1,6 @@
 -r base.txt
 
 sqlparse==0.3.0
+pytest
+pytest-django
+pytest-cov
