@@ -5,16 +5,33 @@ from rest_framework.fields import SerializerMethodField
 from blog.models import Blog, Comment, Profile, UserVote
 
 
+class ProfileSerializer(serializers.HyperlinkedModelSerializer):
+    userid = serializers.ReadOnlyField(source='user.id')
+
+    class Meta:
+        model = Profile
+        fields = ('url', 'id', 'userid', 'gender', 'contact_number', 'date_of_birth', 'image', 'country')
+
+
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    blog = serializers.ReadOnlyField(source='blog.title')
+    profile = ProfileSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ['url', 'id', 'username', 'first_name', 'last_name', 'email', 'blog', 'profile']
+
+
 class ReplySerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField(source='owner.username')
+    owner = UserSerializer(read_only=True)
 
     class Meta:
         model = Comment
-        fields = ['parent', 'id', 'blog', 'description', 'created', 'owner']
+        fields = ['parent', 'id', 'description', 'created', 'owner']
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField(source='owner.username')
+    owner = UserSerializer(read_only=True)
     blog = serializers.HyperlinkedRelatedField(
         view_name='blog-detail',
         lookup_field='slug',
@@ -28,13 +45,13 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def get_reply(self, obj):
         if obj.is_parent:
-            return ReplySerializer(obj.children(), many=True).data
+            return ReplySerializer(obj.children(), many=True, context={'request': self.context['request']}).data
 
         return None
 
 
 class BlogSerializer(serializers.HyperlinkedModelSerializer):
-    owner = serializers.ReadOnlyField(source='owner.username')
+    owner = UserSerializer(read_only=True)
     comment = CommentSerializer(many=True, read_only=True)
 
     class Meta:
@@ -44,23 +61,6 @@ class BlogSerializer(serializers.HyperlinkedModelSerializer):
         extra_kwargs = {
             'url': {'lookup_field': 'slug'}
         }
-
-
-class ProfileSerializer(serializers.HyperlinkedModelSerializer):
-    user = serializers.ReadOnlyField(source='user.username')
-
-    class Meta:
-        model = Profile
-        fields = ('url', 'user', 'gender', 'contact_number', 'date_of_birth', 'image', 'country')
-
-
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    blog = BlogSerializer(many=True, read_only=True)
-    profile = ProfileSerializer(read_only=True)
-
-    class Meta:
-        model = User
-        fields = ['url', 'id', 'username', 'first_name', 'last_name', 'email', 'blog', 'profile']
 
 
 class VoteSerializer (serializers.HyperlinkedModelSerializer):
