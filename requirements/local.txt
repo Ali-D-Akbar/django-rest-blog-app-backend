@@ -1,6 +1,9 @@
 -r base.txt
 
-sqlparse==0.3.0
+coverage==4.5.4
+isort
+pycodestyle
 pytest
+pytest-cov==2.8.1
 pytest-django
-pytest-cov
+sqlparse==0.3.0
