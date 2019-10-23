@@ -27,8 +27,19 @@ class Blog(models.Model):
     def votes(self):
         return Blog.objects.aggregate(
             total_votes=(
-                    Count('post_votes', filter=Q(post_votes__vote_type='U') & Q(post_votes__blog=self)) -
-                    Count('post_votes', filter=Q(post_votes__vote_type='D') & Q(post_votes__blog=self))
+                    Count(
+                        'post_votes', filter=(
+                                Q(post_votes__vote_type='U') &
+                                Q(post_votes__blog=self)
+                        )
+                    )
+                    -
+                    Count(
+                        'post_votes', filter=(
+                                Q(post_votes__vote_type='D') &
+                                Q(post_votes__blog=self)
+                        )
+                    )
             )
         )
 
@@ -56,7 +67,10 @@ class Comment(models.Model):
     blog = models.ForeignKey(Blog, related_name='comment', on_delete=models.CASCADE)
     description = models.TextField(max_length=50000)
     created = models.DateTimeField(auto_now_add=True)
-    owner = models.ForeignKey('auth.User', related_name='comment', on_delete=models.CASCADE, null=True)
+    owner = models.ForeignKey(
+        'auth.User', related_name='comment',
+        on_delete=models.CASCADE, null=True
+    )
 
     def children(self):
         return Comment.objects.filter(parent=self)

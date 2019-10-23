@@ -7,21 +7,16 @@ from rest_framework.response import Response
 
 from blog.models import Blog, Comment, Profile, UserVote
 from blog.permissions import IsOwnerOrReadOnly
-from blog.serializers import (
-    BlogSerializer,
-    CommentSerializer,
-    ProfileSerializer,
-    UserSerializer,
-    VoteSerializer
-)
+from blog.serializers import (BlogSerializer, CommentSerializer,
+                              ProfileSerializer, UserSerializer,
+                              VoteSerializer)
 
 
 class BlogAPI(viewsets.ModelViewSet):
     queryset = Blog.objects.all()
 
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
-        IsOwnerOrReadOnly,
+        permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,
     ]
 
     lookup_field = 'slug'
@@ -43,8 +38,7 @@ class BlogAPI(viewsets.ModelViewSet):
 
         elif request.user.is_authenticated:
             queryset = Blog.objects.filter(
-                Q(draft=False) |
-                (Q(draft=True) & Q(owner=request.user))
+                Q(draft=False) | (Q(draft=True) & Q(owner=request.user))
             )
 
         else:
@@ -54,10 +48,14 @@ class BlogAPI(viewsets.ModelViewSet):
 
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = BlogSerializer(page, many=True, context={'request': request})
+            serializer = BlogSerializer(
+                page, many=True, context={'request': request}
+            )
             return self.get_paginated_response(serializer.data)
 
-        serializer = BlogSerializer(queryset, many=True, context={'request': request})
+        serializer = BlogSerializer(
+            queryset, many=True, context={'request': request}
+        )
         return Response(serializer.data)
 
     @action(detail=True)
@@ -77,6 +75,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    lookup_field = 'username'
 
 
 class CommentAPI(viewsets.ModelViewSet):
