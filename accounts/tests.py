@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, APITestCase
 
-from accounts.views import LoginAPI, RegisterAPI
+from accounts.views import LoginAPI, RegisterAPI, UserAPI
 
 pytestmark = pytest.mark.django_db
 
@@ -12,6 +12,7 @@ class AccountTests(APITestCase):
     """
     Tests for Accounts.
     """
+
     def register(self, credentials):
         """
         Registers a user given the credentials for test purposes.
@@ -98,3 +99,37 @@ class AccountTests(APITestCase):
         response = self.login(credentials)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_get_user(self):
+        """
+        Tests to get the currently logged user.
+        """
+        credentials = {
+            'username': 'test',
+            'email': 'abc@example.com',
+            'password': '123'
+        }
+        response = self.register(credentials)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        credentials = {
+            'username': 'test',
+            'password': '123'
+        }
+
+        response = self.login(credentials)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        token = response.data['token']
+
+        factory = APIRequestFactory()
+        view = UserAPI.as_view()
+        url = 'api/auth/user'
+
+        request = factory.get(url, HTTP_AUTHORIZATION='Token {}'.format(token))
+        response = view(request)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['username'], 'test')

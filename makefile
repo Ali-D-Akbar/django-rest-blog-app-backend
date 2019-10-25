@@ -40,6 +40,6 @@ html_coverage:
 	coverage html && xdg-open htmlcov/index.html
 
 test: clean
-	py.test -vv --nomigrations --cov=. --cov-report term --cov-config=.coveragerc
+	py.test --cov-config=.coveragerc
 
 validate: quality test

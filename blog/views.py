@@ -16,9 +16,7 @@ class BlogAPI(viewsets.ModelViewSet):
     """
     queryset = Blog.objects.all()
 
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,
-    ]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly, ]
 
     lookup_field = 'slug'
 
@@ -48,26 +46,14 @@ class BlogAPI(viewsets.ModelViewSet):
             )
 
         elif request.user.is_authenticated:
-            queryset = Blog.objects.filter(
-                Q(draft=False) | (Q(draft=True) & Q(owner=request.user))
-            )
+            queryset = Blog.objects.filter(Q(draft=False) | (Q(draft=True) & Q(owner=request.user)))
 
         else:
-            queryset = Blog.objects.filter(
-                Q(draft=False)
-            )
+            queryset = Blog.objects.filter(Q(draft=False))
 
         page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = BlogSerializer(
-                page, many=True, context={'request': request}
-            )
-            return self.get_paginated_response(serializer.data)
-
-        serializer = BlogSerializer(
-            queryset, many=True, context={'request': request}
-        )
-        return Response(serializer.data)
+        serializer = BlogSerializer(page, many=True, context={'request': request})
+        return self.get_paginated_response(serializer.data)
 
     @action(detail=True)
     def upvote(self, request, *args, **kwargs):
